@@ -14,6 +14,12 @@ duration: 45min
   State → Command → Result&lt;State, DomainError&gt; / Decision & Evolution
 </div>
 
+<!--
+話すこと:
+- 「FDM寄り」に組み立て直す回。State/Command/Result を一本の軸にする。
+- DDD用語は補助線として使い、実装の型の形を優先する。
+-->
+
 ---
 layout: center
 class: text-left
@@ -30,13 +36,37 @@ class: text-left
 - DDDの全パターン網羅（イベントソーシング等）は扱わない（ただし親和性は触れる）
 - フレームワーク選定やORM設定などの実装詳細は扱わない
 
+<!--
+話すこと:
+- 今日は「設計の形」を持ち帰るのがゴール。ツールはneverthrow固定で説明する。
+- 非ゴールを先に置くことで、深掘りしたくなる気持ちを一旦止める。
+-->
+
 ---
 class: text-left
 ---
 
-## 目次
+## 目次（章）
 
-<Toc minDepth="1" maxDepth="2" />
+<Toc text-sm minDepth="1" maxDepth="1" />
+
+<!--
+話すこと:
+- 章立てだけまず把握してもらう。次ページで詳細に落とす。
+-->
+
+---
+class: text-left
+---
+
+## 目次（詳細）
+
+<Toc text-xs minDepth="1" maxDepth="2" columns="2" />
+
+<!--
+話すこと:
+- 今日の「型の流れ」を追えるように、Decision/Evolution/handle までが中心。
+-->
 
 ---
 level: 1
@@ -44,6 +74,11 @@ class: text-left
 ---
 
 # 1. FDMは何を「うれしく」する？
+
+<!--
+話すこと:
+- ここは動機づけ。設計の表現力とテスト容易性が主な価値。
+-->
 
 ---
 class: text-left
@@ -55,6 +90,12 @@ class: text-left
 - 「何が起きるか」を **Command** として明示できる
 - 「なぜ失敗するか」を **DomainError** として型で表現できる
 - ドメインを純粋関数に寄せ、I/Oを境界に押し出せる（Functional Core / Imperative Shell）
+
+<!--
+話すこと:
+- 「状態機械」として書ける、が体感ポイント。状態とコマンドの組み合わせで仕様が見える。
+- 例外ではなく DomainError に寄せると、失敗理由がドキュメントになる。
+-->
 
 ---
 layout: two-cols
@@ -76,12 +117,23 @@ class: text-left
 - リポジトリ：状態の入出力（I/O側）
 - ドメインイベント：起きた事実（必要なら）
 
+<!--
+話すこと:
+- FDMはDDDを置き換えるというより「戦術の実装スタイル」。
+- 境界（BC）や言葉はDDD、中心ロジックの形はFDM、という分担で考える。
+-->
+
 ---
 level: 1
 class: text-left
 ---
 
 # 2. コア形：State -> Command -> Result<State, DomainError>
+
+<!--
+話すこと:
+- 以降はこの形を何度も反復する。覚えるのはこれだけでもOK。
+-->
 
 ---
 class: text-left
@@ -102,6 +154,12 @@ class: text-left
 
 - `handle = decide(...).map(event => evolve(state, event))`
 
+<!--
+話すこと:
+- Decisionは「拒否理由（DomainError）」を返せる場所。
+- Evolutionは「事実（event）」を畳み込むだけ。基本は失敗させない設計に寄せる。
+-->
+
 ---
 class: text-left
 ---
@@ -112,12 +170,23 @@ class: text-left
 - Evolution：起きた事実を状態に畳み込む（失敗しない想定）
 - テストが書きやすい（副作用なし、入力→出力が固定）
 
+<!--
+話すこと:
+- Decisionのテストは「許可/拒否」。Evolutionのテストは「更新結果」。
+- 分けると、設計の議論が「何が禁止？」「事実が起きたらどう更新？」に収束する。
+-->
+
 ---
 level: 1
 class: text-left
 ---
 
 # 3. neverthrowで失敗を型にする
+
+<!--
+話すこと:
+- TypeScript単体だと例外に流れがち。neverthrowで「失敗を値」に固定する。
+-->
 
 ---
 class: text-left
@@ -129,6 +198,12 @@ class: text-left
 - `ResultAsync<T, E>`：Promiseを包んだ成功/失敗（合成しやすい）
 - `map / andThen / mapErr`：**成功経路/失敗経路**を明示的に繋ぐ
 
+<!--
+話すこと:
+- 「throwしない」方針を型で支えるのが目的。
+- ResultAsyncはI/O境界で便利。ドメイン中心はまずResultで揃える。
+-->
+
 ---
 class: text-left
 ---
@@ -137,12 +212,23 @@ class: text-left
 
 <<< @/snippets/fdm/result-intro.ts
 
+<!--
+話すこと:
+- andThenで「失敗したら後続を止める」を明示できる。
+- エラー型（E）を業務の言葉に寄せるのがコツ。
+-->
+
 ---
 level: 1
 class: text-left
 ---
 
 # 4. 例題：注文（Order）をFDMで書く
+
+<!--
+話すこと:
+- ミニドメインで形を固める。重要なのは「型の分割」。
+-->
 
 ---
 class: text-left
@@ -157,6 +243,12 @@ class: text-left
 
 DDD用語で言うと「集約の振る舞い」を関数として書く。
 
+<!--
+話すこと:
+- State/Command/Eventは「用語」ではなく「インターフェース」。
+- OrderEventは必須ではないが、Decision/Evolution分離が綺麗になるので採用。
+-->
+
 ---
 class: text-left
 ---
@@ -168,7 +260,24 @@ class: text-left
 - 実体はただの構造体でも、**生成を制限**して不正を入れない
 - 失敗は `Result` で返す（例外を投げない）
 
+<!--
+話すこと:
+- ここは「不正値を入れない」入口。後段を楽にするための投資。
+-->
+
+---
+class: text-left text-sm
+---
+
+## Money（コード）
+
 <<< @/snippets/fdm/money.ts
+
+<!--
+話すこと:
+- Evolutionを失敗させないために、Money.add/multiplyは前提を置く。
+- 前提（同一通貨など）はDecisionで担保するのがFDMの基本。
+-->
 
 ---
 class: text-left
@@ -179,15 +288,37 @@ class: text-left
 - インフラ由来のエラー（DB接続失敗等）と区別する
 - 表示文言ではなく **機械可読な種類** を持たせる
 
-<<< @/snippets/fdm/domain-errors.ts
+<!--
+話すこと:
+- DomainErrorは「拒否理由」そのもの。APIやUIの都合は混ぜない。
+-->
 
 ---
-class: text-left
+class: text-left text-sm
+---
+
+## DomainError（コード）
+
+<<< @/snippets/fdm/domain-errors.ts
+
+<!--
+話すこと:
+- エラーは増えても良い。むしろ増えるほど仕様が見える。
+-->
+
+---
+class: text-left text-sm
 ---
 
 ## State / Command / Event
 
 <<< @/snippets/fdm/order-types.ts
+
+<!--
+話すこと:
+- State: いまの事実。Command: やりたいこと。Event: 起きたこと。
+- まず型を固定してから関数を書くのが近道。
+-->
 
 ---
 class: text-left
@@ -201,23 +332,51 @@ class: text-left
 - 明細が空なら `PlaceOrder` は拒否
 - 数量は正の整数、金額は0以上…など
 
-<<< @/snippets/fdm/order-decision.ts
+<!--
+話すこと:
+- Decisionは仕様の中心。「このコマンドはいつ拒否される？」をここに集約する。
+-->
 
 ---
-class: text-left
+class: text-left text-sm
+---
+
+## Decision（コード）
+
+<<< @/snippets/fdm/order-decision.ts
+
+<!--
+話すこと:
+- Commandごとに分岐し、許可される場合だけEventを作る。
+- ここで「計算（lineTotal）」までやってEventに持たせるとEvolutionが軽くなる。
+-->
+
+---
+class: text-left text-sm
 ---
 
 ## Evolution：状態更新は「事実の畳み込み」
 
 <<< @/snippets/fdm/order-evolution.ts
 
+<!--
+話すこと:
+- Evolutionは「eventが起きたなら state はこう変わる」を網羅するだけ。
+- 例外/失敗を起こさない設計に寄せると扱いやすい。
+-->
+
 ---
-class: text-left
+class: text-left text-sm
 ---
 
 ## handle：State -> Command -> Result<State, DomainError>
 
 <<< @/snippets/fdm/order-handle.ts
+
+<!--
+話すこと:
+- handleは「コア形」のそのまま。テストはここを中心に書ける。
+-->
 
 ---
 level: 1
@@ -225,6 +384,11 @@ class: text-left
 ---
 
 # 5. アプリケーション層：I/Oと合成する
+
+<!--
+話すこと:
+- ここからがImperative Shell。ドメインを呼び出すだけにする。
+-->
 
 ---
 class: text-left
@@ -238,13 +402,23 @@ class: text-left
 
 （いわゆるヘキサゴナル / クリーンアーキテクチャの感覚）
 
+<!--
+話すこと:
+- 依存は外向き。ドメインを中心に固定して、周辺（DB/HTTP）を差し替える。
+-->
+
 ---
-class: text-left
+class: text-left text-sm
 ---
 
 ## ポート：リポジトリ（状態の入出力）
 
 <<< @/snippets/fdm/ports.ts
+
+<!--
+話すこと:
+- リポジトリは「状態の入出力」。ここは副作用でOK。
+-->
 
 ---
 class: text-left
@@ -258,7 +432,25 @@ class: text-left
 - I/O境界で例外を捕まえて `ResultAsync` に寄せる（方針化）
 - `load -> handle -> save` の形にそろえる
 
+<!--
+話すこと:
+- アプリ層は「取り出す・流す・保存する」。
+- DomainErrorとInfraErrorを分けると、責務の議論がしやすい。
+-->
+
+---
+class: text-left text-sm
+---
+
+## ユースケース（コード）
+
 <<< @/snippets/fdm/run-command.ts
+
+<!--
+話すこと:
+- handleは同期Resultなので match で ResultAsync に持ち上げる。
+- 例外はrepo実装の中で捕まえて errAsync へ（ここでは省略）。
+-->
 
 ---
 class: text-left
@@ -271,12 +463,22 @@ class: text-left
 
 実務では `DomainError | InfraError` のように合成して扱うと楽。
 
+<!--
+話すこと:
+- 返し方（HTTP 400/409/500 等）は境界の責務。ドメインに持ち込まない。
+-->
+
 ---
 level: 1
 class: text-left
 ---
 
 # 6. 実務のコツ（設計と運用）
+
+<!--
+話すこと:
+- ここは導入の現実論。完璧を目指さずに形を揃える。
+-->
 
 ---
 class: text-left
@@ -288,6 +490,11 @@ class: text-left
 - DecisionにI/Oが混ざる → まず分ける（依存方向を守る）
 - 例外とResultが混在 → 境界で例外を捕まえてResult化（ルール化）
 
+<!--
+話すこと:
+- DecisionにI/Oが入った瞬間にテストが重くなる。まず分けるのが勝ち筋。
+-->
+
 ---
 class: text-left
 ---
@@ -297,6 +504,11 @@ class: text-left
 - ドメイン：純粋関数なので**高速な単体テスト**が中心
 - アプリケーション：ポートをスタブしてユースケースを検証
 - インフラ：契約テスト/統合テストで担保
+
+<!--
+話すこと:
+- ドメインが薄いほど統合テストが増える。ドメインを厚くしてテストを安くする。
+-->
 
 ---
 class: text-left
@@ -309,6 +521,11 @@ class: text-left
 3. 重要な集約の不変条件を明文化して関数にする
 4. ポート分離（DB/HTTP）を後から進める
 
+<!--
+話すこと:
+- まずは「返り値をResultに固定」から始めるのが一番効く。
+-->
+
 ---
 layout: center
 class: text-left
@@ -319,6 +536,11 @@ class: text-left
 - FDMのコアは `State -> Command -> Result<State, DomainError>`
 - Decision（決定）と Evolution（更新）に分けると、複雑さが扱いやすい
 - `neverthrow` の `Result` / `ResultAsync` で、失敗とI/Oを合成できる
+
+<!--
+話すこと:
+- 次にやることは「自分のドメインでState/Commandを1つ決めてhandleを書く」。
+-->
 
 ---
 class: text-left
@@ -331,3 +553,8 @@ class: text-left
 - Scott Wlaschin: Domain Modeling Made Functional
 - “Functional Core, Imperative Shell”
 - Hexagonal Architecture / Clean Architecture
+
+<!--
+話すこと:
+- Wlaschin本は命名が良い。チームの言葉を揃えるのに役立つ。
+-->
