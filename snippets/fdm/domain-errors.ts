@@ -1,3 +1,4 @@
+// #region snippet
 export type DomainError =
   | {
       readonly _tag: 'InvalidMoney'
@@ -8,4 +9,4 @@ export type DomainError =
   | { readonly _tag: 'InvalidQuantity'; readonly quantity: number }
   | { readonly _tag: 'OrderAlreadyPlaced' }
   | { readonly _tag: 'CannotPlaceEmptyOrder' }
-
+// #endregion snippet

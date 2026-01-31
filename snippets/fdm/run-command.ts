@@ -5,6 +5,7 @@ import { handle } from './order-handle'
 import type { InfraError, OrderRepository } from './ports'
 import type { OrderId } from './types'
 
+// #region snippet
 export type RunCommandError = DomainError | InfraError
 
 export const runOrderCommand = (deps: { repo: OrderRepository }) => {
@@ -16,4 +17,4 @@ export const runOrderCommand = (deps: { repo: OrderRepository }) => {
       ),
     )
 }
-
+// #endregion snippet

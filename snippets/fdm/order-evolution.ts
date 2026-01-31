@@ -1,6 +1,7 @@
 import { Money } from './money'
 import type { OrderEvent, OrderState } from './order-types'
 
+// #region snippet
 export const evolve = (state: OrderState, event: OrderEvent): OrderState => {
   switch (event._tag) {
     case 'LineAdded':
@@ -13,4 +14,4 @@ export const evolve = (state: OrderState, event: OrderEvent): OrderState => {
       return { ...state, status: 'Placed' }
   }
 }
-
+// #endregion snippet

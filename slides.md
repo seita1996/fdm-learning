@@ -86,15 +86,40 @@ class: text-left
 
 ## FDMの狙い（超要約）
 
-- **複雑さ**（ビジネスルール）を「状態機械」として書ける
-- 「何が起きるか」を **Command** として明示できる
-- 「なぜ失敗するか」を **DomainError** として型で表現できる
-- ドメインを純粋関数に寄せ、I/Oを境界に押し出せる（Functional Core / Imperative Shell）
+<ul>
+  <li v-click><b>複雑さ</b>（ビジネスルール）を「状態機械」として書ける</li>
+  <li v-click>「何が起きるか」を <b>Command</b> として明示できる</li>
+  <li v-click>「なぜ失敗するか」を <b>DomainError</b> として型で表現できる</li>
+  <li v-click>ドメインを純粋関数に寄せ、I/Oを境界に押し出せる（Functional Core / Imperative Shell）</li>
+</ul>
 
 <!--
 話すこと:
 - 「状態機械」として書ける、が体感ポイント。状態とコマンドの組み合わせで仕様が見える。
 - 例外ではなく DomainError に寄せると、失敗理由がドキュメントになる。
+-->
+
+---
+layout: center
+class: text-left
+---
+
+## メタファーで掴む（アレルギー回避）
+
+<ul>
+  <li v-click><b>ゲーム</b>：State = セーブデータ / Command = ボタン入力</li>
+  <li v-click><b>空港の手続き</b>：Decision = 「搭乗OK？」の判定（NG理由が大事）</li>
+  <li v-click><b>レシピ</b>：Evolution = 手順どおり混ぜるだけ（失敗しない想定）</li>
+</ul>
+
+<div v-after class="mt-6 opacity-70">
+  以降は「概観 → コード」で、同じ理解を何度も上書きします。
+</div>
+
+<!--
+話すこと:
+- まずは言葉より比喩。State/Commandは「ゲームの入出力」だと思うと楽。
+- Decisionは「OK/NGと理由」。Evolutionは「OKなら状態に反映」。
 -->
 
 ---
@@ -104,18 +129,22 @@ class: text-left
 
 ## DDDとの関係（戦略）
 
-- 境界づけられたコンテキスト（BC）
-- ユビキタス言語
-- チームと責務の分割
+<ul>
+  <li v-click>境界づけられたコンテキスト（BC）</li>
+  <li v-click>ユビキタス言語</li>
+  <li v-click>チームと責務の分割</li>
+</ul>
 
 ::right::
 
 ## DDDとの関係（戦術）
 
-- 値オブジェクト：生成で不正を止める
-- 集約：不変条件を守る「単位」
-- リポジトリ：状態の入出力（I/O側）
-- ドメインイベント：起きた事実（必要なら）
+<ul>
+  <li v-click>値オブジェクト：生成で不正を止める</li>
+  <li v-click>集約：不変条件を守る「単位」</li>
+  <li v-click>リポジトリ：状態の入出力（I/O側）</li>
+  <li v-click>ドメインイベント：起きた事実（必要なら）</li>
+</ul>
 
 <!--
 話すこと:
@@ -158,6 +187,58 @@ class: text-left
 話すこと:
 - Decisionは「拒否理由（DomainError）」を返せる場所。
 - Evolutionは「事実（event）」を畳み込むだけ。基本は失敗させない設計に寄せる。
+-->
+
+---
+class: text-left
+---
+
+## 概観：1枚絵（これだけ覚える）
+
+<div class="text-sm leading-7">
+  <div v-click><b>State</b>（いま） + <b>Command</b>（やりたい）</div>
+  <div v-click>→ <b>Decision</b>（OK/NG + 起きる事実）</div>
+  <div v-click>→ <b>Evolution</b>（事実をStateに反映）</div>
+  <div v-click>→ 次の <b>State</b></div>
+</div>
+
+<div v-after class="mt-8 p-3 rounded bg-gray-100/40">
+  例：<code>Draft</code> に <code>PlaceOrder</code> → OKなら <code>OrderPlaced</code> → 状態が <code>Placed</code>
+</div>
+
+<!--
+話すこと:
+- Decisionが仕様の中心、Evolutionが更新の中心。
+- Resultにすることで「失敗経路」がドキュメントになって漏れが減る。
+-->
+
+---
+class: text-left
+---
+
+## コード：最小の形（magic-move）
+
+````md magic-move
+```ts
+// 最初に作るのはこれ
+handle(state, command): Result<State, DomainError>
+```
+
+```ts
+// 中身を分割して「見える化」
+decide(state, command): Result<Event, DomainError>
+evolve(state, event): State
+```
+
+```ts
+// 合成（ここがFDMの型の芯）
+handle = (s, c) => decide(s, c).map((e) => evolve(s, e))
+```
+````
+
+<!--
+話すこと:
+- 「できる/できない（理由）」と「更新」を分けるだけで、議論もテストも楽になる。
 -->
 
 ---
@@ -208,9 +289,30 @@ class: text-left
 class: text-left
 ---
 
+## 概観：成功レーン / 失敗レーン
+
+<div class="text-sm leading-7">
+  <div v-click><b>Result</b> は「分岐を隠さない」ための箱</div>
+  <div v-click><code>ok</code> のときだけ次へ進む（<code>andThen</code>）</div>
+  <div v-click><code>err</code> のときは、そのまま上に返る（例外で飛ばない）</div>
+</div>
+
+<div v-after class="mt-6 opacity-70">
+  初学者のつまずきポイント：<b>「失敗も通常の戻り値」</b> にする。
+</div>
+
+<!--
+話すこと:
+- 例外は「見えないgoto」になりがち。Resultは分岐がコードに残る。
+-->
+
+---
+class: text-left
+---
+
 ## まずは最小例
 
-<<< @/snippets/fdm/result-intro.ts
+<<< @/snippets/fdm/result-intro.ts#snippet
 
 <!--
 話すこと:
@@ -250,6 +352,25 @@ DDD用語で言うと「集約の振る舞い」を関数として書く。
 -->
 
 ---
+layout: center
+class: text-left
+---
+
+## 概観：注文を「ゲーム」にする
+
+<ul>
+  <li v-click><b>State</b>：注文のセーブデータ（明細・合計・状態）</li>
+  <li v-click><b>Command</b>：ボタン入力（AddLine / PlaceOrder）</li>
+  <li v-click><b>DomainError</b>：押してはいけないボタン理由（空の注文は確定不可 など）</li>
+  <li v-click><b>Event</b>：起きた事実（LineAdded / OrderPlaced）</li>
+</ul>
+
+<!--
+話すこと:
+- 「注文」は難しいから、まずゲームの入力/出力に置き換える。
+-->
+
+---
 class: text-left
 ---
 
@@ -271,7 +392,7 @@ class: text-left text-sm
 
 ## Money（コード）
 
-<<< @/snippets/fdm/money.ts
+<<< @/snippets/fdm/money.ts#snippet
 
 <!--
 話すこと:
@@ -299,7 +420,7 @@ class: text-left text-sm
 
 ## DomainError（コード）
 
-<<< @/snippets/fdm/domain-errors.ts
+<<< @/snippets/fdm/domain-errors.ts#snippet
 
 <!--
 話すこと:
@@ -312,12 +433,34 @@ class: text-left text-sm
 
 ## State / Command / Event
 
-<<< @/snippets/fdm/order-types.ts
+<<< @/snippets/fdm/order-types.ts#snippet
 
 <!--
 話すこと:
 - State: いまの事実。Command: やりたいこと。Event: 起きたこと。
 - まず型を固定してから関数を書くのが近道。
+-->
+
+---
+layout: center
+class: text-left
+---
+
+## 概観：Decisionで「ルールブック」を書く
+
+<div class="text-sm leading-7">
+  <div v-click>Decisionは「ルールブック」：この入力は <b>OK/NG</b>？</div>
+  <div v-click>OKなら「何が起きるか（Event）」を返す</div>
+  <div v-click>NGなら「なぜダメか（DomainError）」を返す</div>
+</div>
+
+<div v-after class="mt-6 p-3 rounded bg-gray-100/40">
+  コツ：NG理由はUI向け文章ではなく、<b>機械可読</b>なタグにする
+</div>
+
+<!--
+話すこと:
+- Decisionに仕様を集めると「どこで拒否する？」が一箇所にまとまる。
 -->
 
 ---
@@ -343,7 +486,7 @@ class: text-left text-sm
 
 ## Decision（コード）
 
-<<< @/snippets/fdm/order-decision.ts
+<<< @/snippets/fdm/order-decision.ts#snippet
 
 <!--
 話すこと:
@@ -352,12 +495,30 @@ class: text-left text-sm
 -->
 
 ---
+layout: center
+class: text-left
+---
+
+## 概観：Evolutionは「リプレイ再生」
+
+<div class="text-sm leading-7">
+  <div v-click>Eventログを先頭から再生すると、いつでもStateを作れる</div>
+  <div v-click>Evolutionは「Eventが起きたらStateがこう変わる」を書くだけ</div>
+  <div v-click><b>原則：Evolutionは失敗させない</b>（失敗はDecisionで止める）</div>
+</div>
+
+<!--
+話すこと:
+- Eventは「起きた事実」なので、Evolutionは機械的に畳み込める形が理想。
+-->
+
+---
 class: text-left text-sm
 ---
 
 ## Evolution：状態更新は「事実の畳み込み」
 
-<<< @/snippets/fdm/order-evolution.ts
+<<< @/snippets/fdm/order-evolution.ts#snippet
 
 <!--
 話すこと:
@@ -366,12 +527,29 @@ class: text-left text-sm
 -->
 
 ---
+layout: center
+class: text-left
+---
+
+## 概観：handle = Decision + Evolution
+
+<div class="text-sm leading-7">
+  <div v-click>handleは「司令塔」ではなく <b>合成</b> だけをする</div>
+  <div v-click>だからテストはここに集中できる</div>
+</div>
+
+<!--
+話すこと:
+- handleは薄く。薄いほど設計が保てる。
+-->
+
+---
 class: text-left text-sm
 ---
 
 ## handle：State -> Command -> Result<State, DomainError>
 
-<<< @/snippets/fdm/order-handle.ts
+<<< @/snippets/fdm/order-handle.ts#snippet
 
 <!--
 話すこと:
@@ -396,9 +574,11 @@ class: text-left
 
 ## 依存関係の方向
 
-- **ドメイン（Decision/Evolution）→ 何にも依存しない**
-- アプリケーション → ドメインに依存（ポート＝インターフェースを定義）
-- インフラ → アプリケーションのポートを実装（DB/HTTPなど）
+<ul>
+  <li v-click><b>ドメイン（Decision/Evolution）</b> → 何にも依存しない</li>
+  <li v-click>アプリケーション → ドメインに依存（ポート＝インターフェースを定義）</li>
+  <li v-click>インフラ → アプリケーションのポートを実装（DB/HTTPなど）</li>
+</ul>
 
 （いわゆるヘキサゴナル / クリーンアーキテクチャの感覚）
 
@@ -408,12 +588,34 @@ class: text-left
 -->
 
 ---
+layout: center
+class: text-left
+---
+
+## 概観：受付（I/O）と厨房（ドメイン）を分ける
+
+<div class="text-sm leading-7">
+  <div v-click><b>受付</b>：HTTP/CLI/Queue など（外の世界）</div>
+  <div v-click><b>厨房</b>：handle（純粋、テストしやすい）</div>
+  <div v-click><b>倉庫</b>：Repository（load/save の副作用）</div>
+</div>
+
+<div v-after class="mt-6 p-3 rounded bg-gray-100/40">
+  実装形：<code>load → handle → save</code>
+</div>
+
+<!--
+話すこと:
+- 「厨房に電話が鳴る」みたいな副作用が混ざると一気に複雑化する。
+-->
+
+---
 class: text-left text-sm
 ---
 
 ## ポート：リポジトリ（状態の入出力）
 
-<<< @/snippets/fdm/ports.ts
+<<< @/snippets/fdm/ports.ts#snippet
 
 <!--
 話すこと:
@@ -444,7 +646,7 @@ class: text-left text-sm
 
 ## ユースケース（コード）
 
-<<< @/snippets/fdm/run-command.ts
+<<< @/snippets/fdm/run-command.ts#snippet
 
 <!--
 話すこと:

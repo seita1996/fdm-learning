@@ -1,6 +1,7 @@
 import { err, ok, type Result } from 'neverthrow'
 import type { DomainError } from './domain-errors'
 
+// #region snippet
 export type Currency = 'JPY' | 'USD'
 export type Money = Readonly<{ amount: number; currency: Currency }>
 
@@ -24,4 +25,4 @@ export const Money = {
     return { amount: money.amount * n, currency: money.currency }
   },
 } as const
-
+// #endregion snippet

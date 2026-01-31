@@ -1,6 +1,7 @@
 import type { Money } from './money'
 import type { OrderId, ProductId } from './types'
 
+// #region snippet
 export type OrderStatus = 'Draft' | 'Placed'
 
 export type OrderLine = Readonly<{
@@ -29,4 +30,4 @@ export type OrderCommand =
 export type OrderEvent =
   | { readonly _tag: 'LineAdded'; readonly line: OrderLine; readonly lineTotal: Money }
   | { readonly _tag: 'OrderPlaced' }
-
+// #endregion snippet

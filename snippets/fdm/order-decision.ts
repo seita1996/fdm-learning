@@ -3,6 +3,7 @@ import type { DomainError } from './domain-errors'
 import { Money } from './money'
 import type { OrderCommand, OrderEvent, OrderState } from './order-types'
 
+// #region snippet
 export const decide = (state: OrderState, command: OrderCommand): Result<OrderEvent, DomainError> => {
   if (state.status === 'Placed') return err({ _tag: 'OrderAlreadyPlaced' })
 
@@ -25,4 +26,4 @@ export const decide = (state: OrderState, command: OrderCommand): Result<OrderEv
     }
   }
 }
-
+// #endregion snippet
