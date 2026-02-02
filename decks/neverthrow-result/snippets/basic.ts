@@ -14,7 +14,12 @@ const validateEmail = (email: string): Result<string, DomainError> =>
   email.includes('@') ? ok(email) : err({ _tag: 'InvalidEmail', input: email })
 
 export const createUser = (name: string, email: string): Result<User, DomainError> =>
-  validateName(name).andThen((validName) => validateEmail(email).map((validEmail) => ({ name: validName, email: validEmail })))
+  validateName(name).andThen((validName) =>
+    validateEmail(email).map((validEmail) => ({
+      name: validName,
+      email: validEmail,
+    })),
+  )
 
 export const toMessage = (r: Result<User, DomainError>) =>
   r.match(
@@ -22,4 +27,3 @@ export const toMessage = (r: Result<User, DomainError>) =>
     (e) => `Error: ${e._tag}`,
   )
 // #endregion snippet
-
