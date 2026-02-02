@@ -6,12 +6,15 @@
     "dev": "slidev decks/fdm-intro/slides.md --open",
     "dev:fdm": "slidev decks/fdm-intro/slides.md --open",
     "dev:neverthrow": "slidev decks/neverthrow-result/slides.md --open",
+    "dev:ts-safety": "slidev decks/typescript-type-safety-killers/slides.md --open",
     "build": "slidev build decks/fdm-intro/slides.md",
     "build:fdm": "slidev build decks/fdm-intro/slides.md",
     "build:neverthrow": "slidev build decks/neverthrow-result/slides.md --out dist/neverthrow-result",
+    "build:ts-safety": "slidev build decks/typescript-type-safety-killers/slides.md --out dist/typescript-type-safety-killers",
     "export": "slidev export decks/fdm-intro/slides.md --output dist/fdm-intro.pdf",
     "export:fdm": "slidev export decks/fdm-intro/slides.md --output dist/fdm-intro.pdf",
-    "export:neverthrow": "slidev export decks/neverthrow-result/slides.md --output dist/neverthrow-result.pdf"
+    "export:neverthrow": "slidev export decks/neverthrow-result/slides.md --output dist/neverthrow-result.pdf",
+    "export:ts-safety": "slidev export decks/typescript-type-safety-killers/slides.md --output dist/typescript-type-safety-killers.pdf"
   },
   "dependencies": {
     "@slidev/cli": "^52.11.4",
