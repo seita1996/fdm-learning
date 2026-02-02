@@ -31,3 +31,4 @@ export type OrderEvent =
   | { readonly _tag: 'LineAdded'; readonly line: OrderLine; readonly lineTotal: Money }
   | { readonly _tag: 'OrderPlaced' }
 // #endregion snippet
+

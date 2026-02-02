@@ -3,9 +3,15 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build",
-    "dev": "slidev --open",
-    "export": "slidev export"
+    "dev": "slidev decks/fdm-intro/slides.md --open",
+    "dev:fdm": "slidev decks/fdm-intro/slides.md --open",
+    "dev:neverthrow": "slidev decks/neverthrow-result/slides.md --open",
+    "build": "slidev build decks/fdm-intro/slides.md",
+    "build:fdm": "slidev build decks/fdm-intro/slides.md",
+    "build:neverthrow": "slidev build decks/neverthrow-result/slides.md --out dist/neverthrow-result",
+    "export": "slidev export decks/fdm-intro/slides.md --output dist/fdm-intro.pdf",
+    "export:fdm": "slidev export decks/fdm-intro/slides.md --output dist/fdm-intro.pdf",
+    "export:neverthrow": "slidev export decks/neverthrow-result/slides.md --output dist/neverthrow-result.pdf"
   },
   "dependencies": {
     "@slidev/cli": "^52.11.4",

@@ -10,3 +10,4 @@ export interface OrderRepository {
   save(state: OrderState): ResultAsync<void, InfraError>
 }
 // #endregion snippet
+

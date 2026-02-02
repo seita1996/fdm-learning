@@ -312,7 +312,7 @@ class: text-left
 
 ## まずは最小例
 
-<<< @/snippets/fdm/result-intro.ts#snippet
+<<< ./snippets/fdm/result-intro.ts#snippet
 
 <!--
 話すこと:
@@ -392,7 +392,7 @@ class: text-left text-sm
 
 ## Money（コード）
 
-<<< @/snippets/fdm/money.ts#snippet
+<<< ./snippets/fdm/money.ts#snippet
 
 <!--
 話すこと:
@@ -420,7 +420,7 @@ class: text-left text-sm
 
 ## DomainError（コード）
 
-<<< @/snippets/fdm/domain-errors.ts#snippet
+<<< ./snippets/fdm/domain-errors.ts#snippet
 
 <!--
 話すこと:
@@ -433,7 +433,7 @@ class: text-left text-sm
 
 ## State / Command / Event
 
-<<< @/snippets/fdm/order-types.ts#snippet
+<<< ./snippets/fdm/order-types.ts#snippet
 
 <!--
 話すこと:
@@ -486,7 +486,7 @@ class: text-left text-sm
 
 ## Decision（コード）
 
-<<< @/snippets/fdm/order-decision.ts#snippet
+<<< ./snippets/fdm/order-decision.ts#snippet
 
 <!--
 話すこと:
@@ -518,7 +518,7 @@ class: text-left text-sm
 
 ## Evolution：状態更新は「事実の畳み込み」
 
-<<< @/snippets/fdm/order-evolution.ts#snippet
+<<< ./snippets/fdm/order-evolution.ts#snippet
 
 <!--
 話すこと:
@@ -549,7 +549,7 @@ class: text-left text-sm
 
 ## handle：State -> Command -> Result<State, DomainError>
 
-<<< @/snippets/fdm/order-handle.ts#snippet
+<<< ./snippets/fdm/order-handle.ts#snippet
 
 <!--
 話すこと:
@@ -615,7 +615,7 @@ class: text-left text-sm
 
 ## ポート：リポジトリ（状態の入出力）
 
-<<< @/snippets/fdm/ports.ts#snippet
+<<< ./snippets/fdm/ports.ts#snippet
 
 <!--
 話すこと:
@@ -646,7 +646,7 @@ class: text-left text-sm
 
 ## ユースケース（コード）
 
-<<< @/snippets/fdm/run-command.ts#snippet
+<<< ./snippets/fdm/run-command.ts#snippet
 
 <!--
 話すこと:

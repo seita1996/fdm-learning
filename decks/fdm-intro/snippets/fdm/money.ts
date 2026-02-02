@@ -26,3 +26,4 @@ export const Money = {
   },
 } as const
 // #endregion snippet
+

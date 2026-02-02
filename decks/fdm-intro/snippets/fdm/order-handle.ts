@@ -8,3 +8,4 @@ import type { Result } from 'neverthrow'
 export const handle = (state: OrderState, command: OrderCommand): Result<OrderState, DomainError> =>
   decide(state, command).map((event) => evolve(state, event))
 // #endregion snippet
+

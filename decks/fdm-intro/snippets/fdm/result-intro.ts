@@ -14,3 +14,4 @@ const reciprocal = (n: number): Result<number, DivisionByZero> =>
 
 export const program = (input: string) => parseIntR(input).andThen(reciprocal)
 // #endregion snippet
+

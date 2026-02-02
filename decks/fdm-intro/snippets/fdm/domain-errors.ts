@@ -10,3 +10,4 @@ export type DomainError =
   | { readonly _tag: 'OrderAlreadyPlaced' }
   | { readonly _tag: 'CannotPlaceEmptyOrder' }
 // #endregion snippet
+

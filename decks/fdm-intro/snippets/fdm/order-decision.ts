@@ -27,3 +27,4 @@ export const decide = (state: OrderState, command: OrderCommand): Result<OrderEv
   }
 }
 // #endregion snippet
+
